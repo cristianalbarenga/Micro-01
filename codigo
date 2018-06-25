@@ -28,6 +28,17 @@ void LEDSueltos(){
              }
 }
 
+//--- PAUSA ---//
+//retardo que lee el estado de la llave
+//si la llave esta activada se espera 1/2 seg, sino el puertoC queda sin tension
+void retardo(){
+     if(LLAVE2==1){
+          delay_ms(500);
+     }else{
+          PORTC=0x00;
+          }
+}
+
 //--- 7SEGMENTOS ---//
 // Funcion de control de 7 segmentos
 void SieteSeg(){
@@ -45,7 +56,7 @@ void SieteSeg(){
                case 8: PORTC=0x7F; break;
                case 9: PORTC=0x6F; break;
               }
-              delay_ms(500);
+              retardo(); // funcion de retardo
           }
       }else{
            PORTC=0x00;       // si la llave 2 esta inactiva 7 segmentos queda apagado
