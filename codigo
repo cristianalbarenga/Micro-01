@@ -6,7 +6,6 @@
 
 short count;   //se declara la variable contador
 
-
 //--- LEDS INDEPENDIENTES ---//
 // funcion que maneja los leds individuales
 void LEDSueltos(){
