@@ -1,0 +1,76 @@
+#define LED0 RB0_bit     // se define con el nombre LED0 el puerto RB0
+#define LED1 RB1_bit
+#define LED2 RB2_bit
+#define LLAVE1 RA0_bit
+#define LLAVE2 RA1_bit
+
+short count;   //se declara la variable contador
+
+
+//--- LEDS INDEPENDIENTES ---//
+// funcion que maneja los leds individuales
+void LEDSueltos(){
+        if (LLAVE1==1){
+            LED0=1;
+              delay_ms(250);
+            LED1=1;
+              delay_ms(250);
+            LED2=1;
+              delay_ms(250);
+             LED0=0;
+             LED1=0;
+             LED2=0;
+              delay_ms(1000);
+        }else{
+             LED1=1;
+               delay_ms(100);
+             LED1=0;
+               delay_ms(100);
+             }
+}
+
+//--- 7SEGMENTOS ---//
+// Funcion de control de 7 segmentos
+void SieteSeg(){
+      if(LLAVE2==1){      // si la llave2 se activa
+          for(count=0;count<10;count++){  //para count desde 0 hasta 9 (menor a 10), sumando 1 a count
+              switch(count){        // segun el valor de count elige una opcion
+               case 0: PORTC=0x3F; break;
+               case 1: PORTC=0x06; break;
+               case 2: PORTC=0x5B; break;
+               case 3: PORTC=0x4F; break;
+               case 4: PORTC=0x66; break;
+               case 5: PORTC=0x6D; break;
+               case 6: PORTC=0x7D; break;
+               case 7: PORTC=0x07; break;
+               case 8: PORTC=0x7F; break;
+               case 9: PORTC=0x6F; break;
+              }
+              delay_ms(500);
+          }
+      }else{
+           PORTC=0x00;       // si la llave 2 esta inactiva 7 segmentos queda apagado
+           }
+}
+
+//--- PROGRAMA PRINCIPAL ---//
+void main() {
+     //--- PUERTO A   -- maneja las llaves
+     TRISA=0b00000011;   // TRIS define si es entrada o salida 0= salida, 1= entrada
+     ANSELA=0b00000000;  // ANSELA define si es analogica o digital 0=digital, 1=analogica
+     PORTA=0b00000000;   // definen los puertos 0=sin tensión, 1=con tensión
+     //--- PUERTO B   -- maneja leds independientes
+     TRISB=0b00000000;
+     ANSELB=0b00000000;
+     PORTB=0b00000000;
+     //--- PUERTO C   -- maneja leds 7 segmentos
+     TRISC=0b00000000;
+     ANSELC=0b00000000;
+     PORTC=0b00000000;
+
+     //--- Loop de Ejecucion
+     while(1){
+         LEDSueltos(); // funcion leds independientes
+         SieteSeg();  // funcion 7 segmentos
+     }
+}
