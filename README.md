@@ -1,9 +1,4 @@
 # Micro 01
-Proyecto 01: realizado en el taller de microcontroladores
-programado y diagrama para el micro PIC16F1518
-utilizando LEDS unitarios y 7 segmentos
---------------------------------------------
-cuando llave 1= activada, los leds se prenden de a uno y luego se apagan, 
-       llave 1= apagada= el led del medio titila.
-cuando llave 2= activada, 7 segmentos muestra avanzando desde el numero 0 al 9,
-       llave 2= apagada, 7 segmentos apagado
+taller de microcontroladores - ejercicio 1: tres leds unitarios y 7 segmentos unitario
+la llave 1 - activa el 7 segmentos que realiza cuenta de 0 a 9 (se repite)
+la llave 2 - prenden los tres leds unitarios, uno por vez
