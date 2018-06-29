@@ -1,67 +1,20 @@
-#define LED0 RB0_bit     // se define con el nombre LED0 el puerto RB0
-#define LED1 RB1_bit
-#define LED2 RB2_bit
-#define LLAVE1 RA0_bit
-#define LLAVE2 RA1_bit
+#define LED_0 RB0_bit    // se define con el nombre LED0 el puerto RB0 - led rojo
+#define LED_1 RB1_bit    // led 1 - verde
+#define LED_2 RB2_bit    // led 2 - azul
+#define KEY_1 RA0_bit   // llave 1
+#define KEY_2 RA1_bit   // llave 2
 
-short count;   //se declara la variable contador
+const int numero[]={ 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x67 };  // array de numeros 7segm
+//......//numeros ={- 0 -,- 1 -,- 2 -,- 3 -,- 4 -,- 5 -,- 6 -,- 7 -,- 8 -,- 9 -}
 
-//--- LEDS INDEPENDIENTES ---//
-// funcion que maneja los leds individuales
-void LEDSueltos(){
-        if (LLAVE1==1){
-            LED0=1;
-              delay_ms(250);
-            LED1=1;
-              delay_ms(250);
-            LED2=1;
-              delay_ms(250);
-             LED0=0;
-             LED1=0;
-             LED2=0;
-              delay_ms(1000);
-        }else{
-             LED1=1;
-               delay_ms(100);
-             LED1=0;
-               delay_ms(100);
-             }
-}
+int countK1;  // Contador llave 1
+int num_disp; // Contador numeros del Display
+int tiempoK1; //cantidad de ciclos para llave 1
 
-//--- PAUSA ---//
-//retardo que lee el estado de la llave
-//si la llave esta activada se espera 1/2 seg, sino el puertoC queda sin tension
-void retardo(){
-     if(LLAVE2==1){
-          delay_ms(500);
-     }else{
-          PORTC=0x00;
-          }
-}
+int countK2;  // contador llave 2
+int num_led; //Contador de leds
+int tiempoK2; // cantidad de ciclos para llave 2
 
-//--- 7SEGMENTOS ---//
-// Funcion de control de 7 segmentos
-void SieteSeg(){
-      if(LLAVE2==1){      // si la llave2 se activa
-          for(count=0;count<10;count++){  //para count desde 0 hasta 9 (menor a 10), sumando 1 a count
-              switch(count){        // segun el valor de count elige una opcion
-               case 0: PORTC=0x3F; break;
-               case 1: PORTC=0x06; break;
-               case 2: PORTC=0x5B; break;
-               case 3: PORTC=0x4F; break;
-               case 4: PORTC=0x66; break;
-               case 5: PORTC=0x6D; break;
-               case 6: PORTC=0x7D; break;
-               case 7: PORTC=0x07; break;
-               case 8: PORTC=0x7F; break;
-               case 9: PORTC=0x6F; break;
-              }
-              retardo(); // funcion de retardo
-          }
-      }else{
-           PORTC=0x00;       // si la llave 2 esta inactiva 7 segmentos queda apagado
-           }
-}
 
 //--- PROGRAMA PRINCIPAL ---//
 void main() {
@@ -78,9 +31,60 @@ void main() {
      ANSELC=0b00000000;
      PORTC=0b00000000;
 
-     //--- Loop de Ejecucion
+     //--- INICIALIZACION VARIABLES
+     countK1= 0; //Contador llave 1
+     countK2= 0; //Contador llave 2
+
+     num_disp= 0; //Contador de Display comienza en cero
+     num_led= 0;// Contador de led comienza en 0
+     
+     tiempoK1=1000;
+     tiempoK2=500;
+     
+     //--- LOOP DE EJECUCION
      while(1){
-         LEDSueltos(); // funcion leds independientes
-         SieteSeg();  // funcion 7 segmentos
+       //***** LLAVE 1 *****//
+       if (KEY_1==1){    // si se enciende la llave
+               PORTC= numero[num_disp];  // puerto C muestra numero del Contador de Display, dado por la posicion del array numero
+               
+               countK1 += 1; //se suma 1 al contador llave 1
+
+               if ((countK1 % tiempoK1)==0){ //si el resto de dividir el valor del Contador llave 1 por el tiempoK1 equivale a cero
+                         num_disp += 1;   //se le suma uno al contador del display.
+                         
+                   if(num_disp > 9){ // si el numero de display es mayor a nueve
+                        num_disp= 0;    // lo hace valer cero
+                   }
+               }
+
+       }else{    // si la llave esta desactivada
+             PORTC=0x00;   // apaga el puertoC
+             countK1= 0;   // contador K1 vuelve a cero
+             num_disp=0;   //numero de display vuelve a cero
+             }
+             
+       //***** LLAVE 2 *****//
+       if(KEY_2==1){
+       
+             switch(num_led){    //seleccciona la opcion 0,1 o 2
+               case 0: LED_0=1; LED_1=0; LED_2=0; break;
+               case 1: LED_0=0; LED_1=1; LED_2=0; break;
+               case 2: LED_0=0; LED_1=0; LED_2=1; break;
+             }
+
+             countK2 += 1; // al Contador K2 le suma 1
+
+             if ((countK2 % tiempoK2)==0){ //si el resto de dividir el valor del Contador K2 por el tiempoK2 equivale a cero
+                num_led += 1;   //se le suma uno al contador del led.
+
+                if(num_led > 2){ // si el numero de led es mayor a dos
+                  num_led= 0;    // lo hace valer cero
+                }
+             }
+       }else{   // si la llave esta desactivada
+             LED_0=0; LED_1=0; LED_2=0;   // apaga los leds
+             countK2=0;    // contador K2 vuelve a cero
+             num_led=0;    // numero de led vuelve a cero
+             }
      }
 }
